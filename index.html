@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>百以上物語</title>
+
+  <!-- フォント & アイコン -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+
+  <style>
+    body {
+      font-family: "Shippori Mincho B1", serif;
+      background-color: #fdfff9;
+      color: #313131;
+      margin: 1em 2em;
+    }
+
+    ::selection{
+      background:#8a1a29;
+      color:#fff;
+    }
+
+    header {
+      margin: 2em 0 1em;
+    }
+
+    header h1 {
+      font-size: 2em;
+      margin-bottom: 0.2em;
+    }
+
+    header .subtext {
+      font-size: 1.1em;
+      color: #444;
+      margin-bottom: 1em;
+      line-height: 1.6;
+    }
+
+    header .thanks {
+      font-size: 0.95em;
+      color: #666;
+      line-height: 1;
+      margin-bottom: 1.5em;
+    }
+
+    a {
+      color: #666;
+      text-decoration: underline dotted;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1em;
+    }
+
+    div.thread {
+      margin: 3em 0;
+      max-width: 1200px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      border-left: 4px solid transparent;
+    }
+
+    div.thread.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    div.thread.favorite {
+      background: #fffbe6;
+      border-left-color: #e3b341;
+    }
+
+    p.name{color:#9f9f9f}
+
+    p.name span.nanashi {
+      font-weight: bold;
+      color: #313131;
+    }
+
+    .favorite-btn {
+      margin-left: 1em;
+      font-size: 0.9em;
+      background: transparent;
+      color: #e3b341;
+      border: none;
+      cursor: pointer;
+    }
+
+    div.naiyo {
+      margin: 1em 0;
+    }
+
+    /* p.motot {
+      margin-top: 0.5em;
+    } */
+
+    #tag-filter, #type-filter {
+      margin: 1em 0;
+    }
+
+    button {
+      padding: 0.4em 1em;
+      margin: 0.2em;
+      border-radius: 8px;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #fff;
+    }
+
+    button.tag_all { background: #1b1b1b; }
+    button.tag_all:hover { background: #fff; color: #1b1b1b; outline: 1px solid #1b1b1b; }
+
+    button.tag_favorite { background: #e3b341; }
+    button.tag_favorite:hover { background: #fff; color: #e3b341; outline: 1px solid #e3b341; }
+
+    /* ===== 場所カテゴリ ===== */
+    button.tag_company { background: #4E2A3E; }
+    button.tag_company:hover { background: #fff; color: #4E2A3E; outline: 1px solid #4E2A3E; }
+
+    button.tag_nature { background: #5A3D50; }
+    button.tag_nature:hover { background: #fff; color: #5A3D50; outline: 1px solid #5A3D50; }
+
+    button.tag_school { background: #704F66; }
+    button.tag_school:hover { background: #fff; color: #704F66; outline: 1px solid #704F66; }
+
+    button.tag_hospital { background: #8C6F88; }
+    button.tag_hospital:hover { background: #fff; color: #8C6F88; outline: 1px solid #8C6F88; }
+
+    button.tag_elevator { background: #9C7B91; }
+    button.tag_elevator:hover { background: #fff; color: #9C7B91; outline: 1px solid #9C7B91; }
+
+    button.tag_theater { background: #A98FA8; }
+    button.tag_theater:hover { background: #fff; color: #A98FA8; outline: 1px solid #A98FA8; }
+
+    button.tag_etc { background: #B9AAB7; }
+    button.tag_etc:hover { background: #fff; color: #B9AAB7; outline: 1px solid #B9AAB7; }
+
+    /* ===== 系統カテゴリ ===== */
+    button.tag_disaster { background: #2C3A50; }
+    button.tag_disaster:hover { background: #fff; color: #2C3A50; outline: 1px solid #2C3A50; }
+
+    button.tag_accident { background: #456472; }
+    button.tag_accident:hover { background: #fff; color: #456472; outline: 1px solid #456472; }
+
+    button.tag_human { background: #5F7B91; }
+    button.tag_human:hover { background: #fff; color: #5F7B91; outline: 1px solid #5F7B91; }
+
+    button.tag_unknown { background: #7B8A99; }
+    button.tag_unknown:hover { background: #fff; color: #7B8A99; outline: 1px solid #7B8A99; }
+
+    button.tag_method { background: #889496; }
+    button.tag_method:hover { background: #fff; color: #889496; outline: 1px solid #889496; }
+
+    button.tag_other { background: #AAB9C3; }
+    button.tag_other:hover { background: #fff; color: #AAB9C3; outline: 1px solid #AAB9C3; }
+
+    ul {
+      padding-left: 1.2em;
+    }
+    li {
+      margin-bottom: 0.5em;
+      line-height: 1.6;
+    }
+
+    #scrollToTop {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100;
+      background-color: #8a1a29;
+      color: white;
+      border: none;
+      padding: 0.6em 1em;
+      border-radius: 50%;
+      font-size: 1.2em;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    #scrollToTop.show {
+      opacity: 1;
+    }
+
+    
+    @keyframes favoritePop {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0px rgba(255, 200, 100, 0);
+      }
+      50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 15px rgba(255, 200, 100, 0.6);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0px rgba(255, 200, 100, 0);
+      }
+    }
+
+    .thread.favorite.fav-anim {
+      animation: favoritePop 0.4s ease-in-out;
+    }
+
+
+    @media (max-width: 768px) {
+      .thread {
+        font-size: 14px;
+        padding: 10px;
+        margin: unset !important;
+      }
+
+      .tag-button {
+        font-size: 12px;
+      }
+
+      #scrollToTop {
+        font-size: 1em;
+        padding: 0.5em 0.8em;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(49, 49, 49, 0.7);
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+  <header>
+    <h1>百以上物語</h1>
+    <div class="thanks">
+      <p>🔰 最初に投稿された方：<a href="https://x.com/fpsg1" target="_blank">@fpsg1</a>さん</p>
+      <p>📌 該当ポスト：<a href="https://x.com/fpsg1/status/1907095262058983693" target="_blank">こちらのポスト</a></p>
+      <p>📝 スプレッドシートまとめ：<a href="https://x.com/genkooyooshi" target="_blank">@genkooyooshi</a>さん</p>
+      <p>📌 該当ポスト：<a href="https://x.com/genkooyooshi/status/1909233781812367826" target="_blank">こちらのポスト</a></p>
+
+      <p class="subtext">※こちらは非公式のまとめです。</p>
+    </div>
+  </header>
+  
+  <div>
+    <div id="tag-filter">
+      <button class="tag_all" data-tags="all">全て表示</button>
+      <button class="tag_favorite" data-tags="お気に入り">お気に入り</button>
+    </div>
+    <div id="tag-filter">
+      <p style="margin-bottom: 0;">場所</p>
+      <button class="tag_company" data-tags="工場・会社">工場・会社</button>
+      <button class="tag_nature" data-tags="自然">自然</button>
+      <button class="tag_school" data-tags="学校">学校</button>
+      <button class="tag_hospital" data-tags="病院">病院</button>
+      <button class="tag_elevator" data-tags="エレベーター">エレベーター</button>
+      <button class="tag_theater" data-tags="劇場">劇場</button>
+      <button class="tag_etc" data-tags="その他">その他</button>
+    </div>
+    <div id="type-filter">
+      <p style="margin-bottom: 0;">系統</p>
+      <button class="tag_disaster" data-type="災害">災害</button>
+      <button class="tag_accident" data-type="事故">事故</button>
+      <button class="tag_human" data-type="人・動物">人・動物</button>
+      <button class="tag_unknown" data-type="正体不明">正体不明</button>
+      <button class="tag_method" data-type="対処法">対処法</button>
+      <button class="tag_other" data-type="他">その他</button>
+    </div>
+  </div>
+
+  <div id="threads-container"></div>
+
+  <button id="scrollToTop" title="上に戻る">▲</button>
+
+  <script>
+    function tagClass(tag) {
+      return tag.replace(/[・\s]/g, '').toLowerCase();
+    }
+
+    function tagClass(tag) {
+      const map = {
+        "工場・会社": "company",
+        "自然": "nature",
+        "学校": "school",
+        "病院": "hospital",
+        "エレベーター": "elevator",
+        "劇場": "theater",
+        "その他": "etc",
+        "災害": "disaster",
+        "事故": "accident",
+        "人・動物": "human",
+        "正体不明": "unknown",
+        "対処法": "method",
+        "他": "other",
+        "お気に入り": "favorite",
+        "all": "all"
+      };
+      return map[tag] || "other";
+    }
+
+    function loadFavorites() {
+      return JSON.parse(localStorage.getItem('favoriteThreads') || '[]');
+    }
+
+    function saveFavorites(favorites) {
+      localStorage.setItem('favoriteThreads', JSON.stringify(favorites));
+    }
+
+    function toggleFavorite(id, button, threadElement) {
+      const favorites = loadFavorites();
+      const index = favorites.indexOf(id);
+
+      if (index === -1) {
+        favorites.push(id);
+        threadElement.classList.add('favorite');
+        button.textContent = '★ お気に入り解除';
+
+        threadElement.classList.add('fav-anim');
+        setTimeout(() => {
+          threadElement.classList.remove('fav-anim');
+        }, 400);
+      } else {
+        favorites.splice(index, 1);
+        threadElement.classList.remove('favorite');
+        button.textContent = '☆ お気に入り';
+      }
+      saveFavorites(favorites);
+    }
+
+    async function loadThreads() {
+      const res = await fetch('./threads.json');
+      const data = await res.json();
+      const container = document.getElementById('threads-container');
+      const favorites = loadFavorites();
+
+      data.forEach((thread, index) => {
+        const num = String(index + 1).padStart(3, '0');
+        const isFavorite = favorites.includes(thread.id);
+        const div = document.createElement('div');
+
+        div.className = 'thread' + (isFavorite ? ' favorite' : '');
+        div.dataset.tags = thread.place;
+        div.dataset.type = thread.type;
+        div.dataset.id = thread.id;
+
+        div.innerHTML = `
+          <p class="name">
+            <span class="nanashi">${num}.${thread.name}</span>　ID：${thread.id}
+            <button class="favorite-btn">${isFavorite ? '★ お気に入り解除' : '☆ お気に入り'}</button>
+          </p>
+          <div class="naiyo">${thread.content.map(line => `<div>${line}</div>`).join('')}</div>
+          <div class="tag-buttons">
+            <button class="tag_${tagClass(thread.place)}" data-tags="${thread.place}">${thread.place}</button>
+            <button class="tag_${tagClass(thread.type)}" data-type="${thread.type}">${thread.type}</button>
+            <!-- <button class="tag_favorite" data-tags="お気に入り">お気に入り</button>
+          </div> -->
+          <p class="motot"><a href="${thread.url}" target="_blank"><i class="lab la-twitter"></i>元ツイ</a></p>
+        `;
+
+        const favBtn = div.querySelector('.favorite-btn');
+        favBtn.addEventListener('click', () => {
+          toggleFavorite(thread.id, favBtn, div);
+        });
+
+        container.appendChild(div);
+      });
+
+      observeThreads();
+    }
+
+    function observeThreads() {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+          }
+        });
+      });
+      document.querySelectorAll('.thread').forEach(thread => observer.observe(thread));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadThreads();
+
+      document.body.addEventListener('click', function(e) {
+        const threads = document.querySelectorAll('.thread');
+
+        if (e.target.matches('button[data-tags]')) {
+          const filter = e.target.dataset.tags;
+          threads.forEach(thread => {
+            const isFav = thread.classList.contains('favorite');
+            const tag = thread.dataset.tags || "";
+            thread.style.display =
+              filter === "all" || (filter === "お気に入り" && isFav) || tag.includes(filter)
+                ? "block"
+                : "none";
+          });
+        }
+
+        if (e.target.matches('button[data-type]')) {
+          const typeFilter = e.target.dataset.type;
+          threads.forEach(thread => {
+            const type = thread.dataset.type || "";
+            thread.style.display =
+              typeFilter === "all" || type.includes(typeFilter)
+                ? "block"
+                : "none";
+          });
+        }
+      });
+    });
+
+    const scrollBtn = document.getElementById("scrollToTop");
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add("show");
+      } else {
+        scrollBtn.classList.remove("show");
+      }
+    });
+
+    scrollBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+  </script>
+  </div>
+</body>
+</html>
